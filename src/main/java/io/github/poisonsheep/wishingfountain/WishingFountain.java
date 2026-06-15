@@ -1,11 +1,13 @@
 package io.github.poisonsheep.wishingfountain;
 
 import io.github.poisonsheep.wishingfountain.block.multiblock.MultiBlockManager;
+import io.github.poisonsheep.wishingfountain.command.WishingFountainCommand;
 import io.github.poisonsheep.wishingfountain.config.CommonConfigs;
 import io.github.poisonsheep.wishingfountain.event.ForgeEvent;
 import io.github.poisonsheep.wishingfountain.loot.ModGlobalLootModifiers;
 import io.github.poisonsheep.wishingfountain.registry.*;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -49,5 +51,10 @@ public class WishingFountain {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         MultiBlockManager.init();
+    }
+
+    @SubscribeEvent
+    public void onRegisterCommands(RegisterCommandsEvent event) {
+        WishingFountainCommand.register(event.getDispatcher());
     }
 }

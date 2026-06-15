@@ -23,8 +23,8 @@ import java.util.List;
 
 public class WFMultiBlock implements IMultiBlock {
 
-    private static final ResourceLocation WISHING_FOUNTAIN_TARGET = new ResourceLocation(WishingFountain.MODID, "wishing_fountain_target");
-    private static final ResourceLocation WISHING_FOUNTAIN_STRUCTURE = new ResourceLocation(WishingFountain.MODID, "wishing_fountain_structure");
+    private static final ResourceLocation WISHING_FOUNTAIN_TARGET = ResourceLocation.parse(WishingFountain.MODID + ":wishing_fountain_target");
+    private static final ResourceLocation WISHING_FOUNTAIN_STRUCTURE = ResourceLocation.parse(WishingFountain.MODID + ":wishing_fountain_structure");
 
     //喷泉中心相对于初始位置的坐标
     private static final BlockPos CENTER = new BlockPos(2, 2 ,2);
