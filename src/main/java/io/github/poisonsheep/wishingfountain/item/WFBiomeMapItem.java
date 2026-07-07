@@ -1,9 +1,13 @@
 package io.github.poisonsheep.wishingfountain.item;
 
+import io.github.poisonsheep.wishingfountain.config.CommonConfigs;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -19,13 +23,19 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class WFBiomeMapItem extends WFMapItem {
+    private static final Logger LOGGER = LoggerFactory.getLogger("WFBiomeMapItem");
+
     private final ResourceLocation target_biome = Biomes.MUSHROOM_FIELDS.location();
 
     public WFBiomeMapItem() {
@@ -84,31 +94,12 @@ public class WFBiomeMapItem extends WFMapItem {
     }
 
     protected InteractionResultHolder<BlockPos> searchIterative(ResourceLocation targetBiome, ItemStack stack, ServerLevel worldIn, Player player) {
-        int y = player.getBlockY();
-        for(int i = 0; i < Integer.MAX_VALUE; i++) {
-            final int height = 64;
-            BlockPos nextPos = nextPos(stack, 32);
-            if(nextPos == null) {
-                return InteractionResultHolder.fail(BlockPos.ZERO);
-            }
-            int[] searchedHeights = Mth.outFromOrigin(y, worldIn.getMinBuildHeight() + 1, worldIn.getMaxBuildHeight(), height).toArray();
-            int testX = nextPos.getX();
-            int testZ = nextPos.getZ();
-            int quartX = QuartPos.fromBlock(testX);
-            int quartZ = QuartPos.fromBlock(testZ);
-            for(int testY : searchedHeights) {
-                int quartY = QuartPos.fromBlock(testY);
-                ServerChunkCache cache = worldIn.getChunkSource();
-                BiomeSource source = cache.getGenerator().getBiomeSource();
-                Climate.Sampler sampler = cache.randomState().sampler();
-                Holder<Biome> holder = source.getNoiseBiome(quartX, quartY, quartZ, sampler);
-                if(holder.is(targetBiome)) {
-                    BlockPos mapPos = new BlockPos(testX, testY, testZ);
-                    return InteractionResultHolder.sidedSuccess(mapPos, worldIn.isClientSide);
-                }
-            }
-        }
-        return InteractionResultHolder.pass(BlockPos.ZERO);
+        BlockPos startPos = new BlockPos(
+                stack.getOrCreateTag().getInt(SOURCE_X),
+                player.getBlockY(),
+                stack.getOrCreateTag().getInt(SOURCE_Z)
+        );
+        return searchBiome(worldIn, startPos, targetBiome);
     }
 
     private BlockPos calculateBiomeCenter(ServerLevel worldIn, BlockPos biomeCorner, ResourceLocation biome) {
@@ -148,6 +139,78 @@ public class WFBiomeMapItem extends WFMapItem {
         return source.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2, sampler);
     }
 
+    public static InteractionResultHolder<BlockPos> searchBiome(ServerLevel worldIn, BlockPos startPos, ResourceLocation targetBiome) {
+        int sourceX = startPos.getX();
+        int sourceZ = startPos.getZ();
+        int y = startPos.getY();
+        int step = 32;
+        int radius = CommonConfigs.SEARCHING_RADIUS.get();
+        int maxLegs = 4 * Math.floorDiv(radius, step);
+
+        ResourceKey<Biome> targetKey = ResourceKey.create(Registries.BIOME, targetBiome);
+
+        BlockPos hit = checkBiomeAt(sourceX, sourceZ, y, worldIn, targetKey);
+        if (hit != null) {
+            return InteractionResultHolder.success(hit);
+        }
+
+        int x = 0, z = 0, leg = 0, legIndex = 0;
+
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            Direction dir = DIRECTIONS[(leg + 4) % 4];
+            BlockPos cursor = new BlockPos(x, 0, z).relative(dir);
+            x = cursor.getX();
+            z = cursor.getZ();
+            int legSize = leg / 2 + 1;
+
+            if (legIndex >= legSize) {
+                if (leg > maxLegs)
+                    return InteractionResultHolder.fail(BlockPos.ZERO);
+                leg++;
+                legIndex = 0;
+            }
+            legIndex++;
+
+            int testX = sourceX + x * step;
+            int testZ = sourceZ + z * step;
+
+            hit = checkBiomeAt(testX, testZ, y, worldIn, targetKey);
+            if (hit != null) {
+                return InteractionResultHolder.success(hit);
+            }
+        }
+        return InteractionResultHolder.fail(BlockPos.ZERO);
+    }
+
+    private static BlockPos checkBiomeAt(int testX, int testZ, int playerY, ServerLevel worldIn, ResourceKey<Biome> targetKey) {
+        int[] searchedHeights = Mth.outFromOrigin(playerY, worldIn.getMinBuildHeight() + 1, worldIn.getMaxBuildHeight(), 64).toArray();
+        int quartX = QuartPos.fromBlock(testX);
+        int quartZ = QuartPos.fromBlock(testZ);
+        ServerChunkCache cache = worldIn.getChunkSource();
+        BiomeSource source = cache.getGenerator().getBiomeSource();
+        Climate.Sampler sampler = cache.randomState().sampler();
+
+        for (int testY : searchedHeights) {
+            int quartY = QuartPos.fromBlock(testY);
+            Holder<Biome> holder = source.getNoiseBiome(quartX, quartY, quartZ, sampler);
+            if (holder.is(targetKey)) {
+                return new BlockPos(testX, testY, testZ);
+            }
+        }
+        return null;
+    }
+    
+    public static void searchBiomeAsync(ServerLevel worldIn, BlockPos startPos, ResourceLocation targetBiome, Consumer<InteractionResultHolder<BlockPos>> callback) {
+        EXECUTORS.submit(() -> {
+            try {
+                InteractionResultHolder<BlockPos> result = searchBiome(worldIn, startPos, targetBiome);
+                callback.accept(result);
+            } catch (Exception e) {
+                callback.accept(InteractionResultHolder.fail(BlockPos.ZERO));
+            }
+        });
+    }
+
     public static void setTarget(ItemStack itemStack, String target) {
         itemStack.getOrCreateTag().putString(TARGET, target);
     }
@@ -156,5 +219,5 @@ public class WFBiomeMapItem extends WFMapItem {
 
     private static final Map<Key, InteractionResultHolder<BlockPos>> RESULTS = new ConcurrentHashMap<>();
     private static final Set<Key> COMPUTING = ConcurrentHashMap.newKeySet();
-    protected static final ExecutorService EXECUTORS = Executors.newCachedThreadPool();
+    protected static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(2);
 }
