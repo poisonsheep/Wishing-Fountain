@@ -53,8 +53,8 @@ abstract class WFMapItem extends Item {
         }
         Vec3 pos = player.getPosition(1F);
         handStack.getOrCreateTag().putBoolean(IS_SEARCHING, true);
-        handStack.getOrCreateTag().putDouble(SOURCE_X, pos.x);
-        handStack.getOrCreateTag().putDouble(SOURCE_Z, pos.z);
+        handStack.getOrCreateTag().putInt(SOURCE_X, (int) pos.x);
+        handStack.getOrCreateTag().putInt(SOURCE_Z, (int) pos.z);
         handStack.getOrCreateTag().putDouble(DISTANCE, Double.MAX_VALUE);
         playSound(worldIn, player);
         return InteractionResultHolder.sidedSuccess(handStack, worldIn.isClientSide);
@@ -92,8 +92,8 @@ abstract class WFMapItem extends Item {
     }
 
     protected static BlockPos nextPos(ItemStack stack, int step) {
-        int sourceX = stack.getOrCreateTag().getInt(SOURCE_X);
-        int sourceZ = stack.getOrCreateTag().getInt(SOURCE_Z);
+        int sourceX = (int) stack.getOrCreateTag().getDouble(SOURCE_X);
+        int sourceZ = (int) stack.getOrCreateTag().getDouble(SOURCE_Z);
         int x = stack.getOrCreateTag().getInt(POS_X);
         int z = stack.getOrCreateTag().getInt(POS_Z);
         int leg = stack.getOrCreateTag().getInt(POS_LEG);

@@ -70,8 +70,8 @@ public class WFBiomeMapItem extends WFMapItem {
 
     //并发搜索模式
     protected InteractionResultHolder<BlockPos> searchConcurrent(ResourceLocation targetBiome, ServerLevel worldIn, ItemStack stack, Player player) {
-        int centerX = stack.getOrCreateTag().getInt(SOURCE_X);
-        int centerZ = stack.getOrCreateTag().getInt(SOURCE_Z);
+        int centerX = (int) stack.getOrCreateTag().getDouble(SOURCE_X);
+        int centerZ = (int) stack.getOrCreateTag().getDouble(SOURCE_Z);
         BlockPos centerPos = new BlockPos(centerX, 64, centerZ);
         Key key = new Key(GlobalPos.of(worldIn.dimension(), centerPos), targetBiome);
         if(COMPUTING.contains(key)) {

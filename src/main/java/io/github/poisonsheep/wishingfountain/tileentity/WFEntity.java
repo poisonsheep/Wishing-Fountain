@@ -93,6 +93,9 @@ public class WFEntity extends BlockEntity {
         storageState = Block.stateById(getPersistentData().getInt(STORAGE_STATE_ID));
         textureIndex = getPersistentData().getInt(TEXTURE_INDEX);
         direction = Direction.byName(getPersistentData().getString(DIRECTION));
+        if (direction == null) {
+            direction = Direction.SOUTH;
+        }
         blockPosList.deserialize(getPersistentData().getList(STORAGE_BLOCK_LIST, Tag.TAG_COMPOUND));
         handler.deserializeNBT(getPersistentData().getCompound(STORAGE_ITEM));
     }

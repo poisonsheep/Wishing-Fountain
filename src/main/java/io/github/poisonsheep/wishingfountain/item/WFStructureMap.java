@@ -44,8 +44,8 @@ public class WFStructureMap extends WFMapItem{
         if(target == null) {
             return ItemStack.EMPTY;
         }
-        int centerX = stack.getOrCreateTag().getInt(SOURCE_X);
-        int centerZ = stack.getOrCreateTag().getInt(SOURCE_Z);
+        int centerX = (int) stack.getOrCreateTag().getDouble(SOURCE_X);
+        int centerZ = (int) stack.getOrCreateTag().getDouble(SOURCE_Z);
         BlockPos centerPos = new BlockPos(centerX, 64, centerZ);
         SearchKey key = new SearchKey(GlobalPos.of(worldIn.dimension(), centerPos), target.toString());
 

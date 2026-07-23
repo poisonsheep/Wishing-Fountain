@@ -36,7 +36,7 @@ public class WFRecipeInventory implements Container {
 
     @Override
     public ItemStack getItem(int index) {
-        return this.getContainerSize() <= index ? ItemStack.EMPTY : this.items.get(index);
+        return index < 0 || this.getContainerSize() <= index ? ItemStack.EMPTY : this.items.get(index);
     }
 
     @Override
