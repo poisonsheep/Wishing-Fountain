@@ -7,6 +7,7 @@ import io.github.poisonsheep.wishingfountain.config.CommonConfigs;
 import io.github.poisonsheep.wishingfountain.registry.AdvancementTriggerRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -36,7 +38,7 @@ public class ForgeEvent {
             for (ItemEntity itemEntity : itemEntityList) {
                 ItemStack itemStack = itemEntity.getItem();
                 // 检查物品是否可以用于创建结构
-                Item triggerItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(CommonConfigs.TRIGGER_ITEM.get()));
+                Item triggerItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(CommonConfigs.TRIGGER_ITEM.get()));
                 if (itemStack.getItem() == triggerItem) {
                     List<IMultiBlock> multiBlockList = MultiBlockManager.getMultiBlockList();
                     BlockPos pos = itemEntity.blockPosition();
@@ -49,6 +51,14 @@ public class ForgeEvent {
                                 StructureTemplate targetTemplate = multiBlock.getTemplateTarget((ServerLevel) worldIn);
                                 StructureTemplate structureTemplate = multiBlock.getTemplateStructure((ServerLevel) worldIn);
                                 if (multiBlock.isMatch(worldIn, posStart, targetTemplate)) {
+                                    String requiredBp = getRequiredBlueprint();
+                                    if (requiredBp != null && !hasBlueprint(player, requiredBp)) {
+                                        player.displayClientMessage(Component.translatable(
+                                            "message.wishing_fountain.need_blueprint",
+                                            Component.translatable(requiredBp.replace(":", "."))
+                                        ), true);
+                                        continue;
+                                    }
                                     multiBlock.build(worldIn, posStart, structureTemplate, direction);
                                     ItemStack stack = itemEntity.getItem();
                                     stack.shrink(1);
@@ -65,6 +75,27 @@ public class ForgeEvent {
                     }
                 }
             }
+        }
+    }
+
+    /** @return the required blueprint ID, or null if Blueprint mod is not installed or config is empty */
+    private static String getRequiredBlueprint() {
+        if (!ModList.get().isLoaded("butdaysblueprint")) {
+            return null;
+        }
+        String bp = CommonConfigs.REQUIRED_BLUEPRINT.get();
+        return bp.isEmpty() ? null : bp;
+    }
+
+    /** Check if the player has learned the given blueprint.
+     *  Uses reflection to avoid hard dependency on Blueprint mod classes. */
+    private static boolean hasBlueprint(Player player, String blueprintId) {
+        try {
+            Class<?> bridge = Class.forName("io.github.poisonsheep.wishingfountain.compat.blueprint.BlueprintBridge");
+            return (boolean) bridge.getMethod("hasBlueprint", Player.class, String.class)
+                .invoke(null, player, blueprintId);
+        } catch (Exception e) {
+            return true; // fail-safe: Blueprint not installed or error, allow building
         }
     }
 }

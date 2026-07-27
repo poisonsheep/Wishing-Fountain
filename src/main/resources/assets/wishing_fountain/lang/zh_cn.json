@@ -62,5 +62,12 @@
   "structure.minecraft.village_plains": "平原村庄",
   "structure.minecraft.village_savanna": "热带草原村庄",
   "structure.minecraft.village_snowy": "雪原村庄",
-  "structure.minecraft.village_taiga": "针叶林村庄"
+  "structure.minecraft.village_taiga": "针叶林村庄",
+  "structure.minecraft.ancient_city": "远古城市",
+  "structure.minecraft.mineshaft": "废弃矿井",
+  "structure.minecraft.igloo": "雪屋",
+  "structure.minecraft.buried_treasure": "埋藏的宝藏",
+  "structure.minecraft.ocean_ruin_cold": "冷水海底废墟",
+  "structure.minecraft.ocean_ruin_warm": "暖水海底废墟",
+  "message.wishing_fountain.need_blueprint": "你尚不知晓这座建筑的建造方法……也许%s记载着这个秘密"
 }

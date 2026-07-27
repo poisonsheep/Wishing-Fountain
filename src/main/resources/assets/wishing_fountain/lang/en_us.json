@@ -60,5 +60,13 @@
   "structure.minecraft.village_plains": "Village Plains",
   "structure.minecraft.village_savanna": "Village Savanna",
   "structure.minecraft.village_snowy": "Village Snowy",
-  "structure.minecraft.village_taiga": "Village Taiga"
+  "structure.minecraft.village_taiga": "Village Taiga",
+  "structure.minecraft.ancient_city": "Ancient City",
+  "structure.minecraft.trail_ruins": "Trail Ruins",
+  "structure.minecraft.mineshaft": "Mineshaft",
+  "structure.minecraft.igloo": "Igloo",
+  "structure.minecraft.buried_treasure": "Buried Treasure",
+  "structure.minecraft.ocean_ruin_cold": "Ocean Ruins Cold",
+  "structure.minecraft.ocean_ruin_warm": "Ocean Ruins Warm",
+  "message.wishing_fountain.need_blueprint": "You lack the knowledge to build this... Perhaps %s holds the secret."
 }

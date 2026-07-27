@@ -1,0 +1,10 @@
+{
+  "type": "wishing_fountain:wishing_fountain_recipe",
+  "wish_type": "biome",
+  "target": "minecraft:forest",
+  "ingredients": [
+    { "item": "minecraft:oak_sapling" },
+    { "item": "minecraft:apple" },
+    { "item": "minecraft:bone_meal" }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "wishing_fountain:wishing_fountain_recipe",
+  "wish_type": "structure",
+  "target": "minecraft:igloo",
+  "ingredients": [
+    { "item": "minecraft:emerald" },
+    { "item": "minecraft:torch" },
+    { "item": "minecraft:white_wool" }
+  ]
+}

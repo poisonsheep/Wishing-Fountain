@@ -151,7 +151,7 @@ abstract class WFMapItem extends Item {
         if (tag.isEmpty()) {
             return getDefaultTarget();
         }
-        return new ResourceLocation(tag);
+        return ResourceLocation.tryParse(tag);
     }
 
     protected abstract ResourceLocation getDefaultTarget();

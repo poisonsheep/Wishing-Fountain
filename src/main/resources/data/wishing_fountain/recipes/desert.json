@@ -1,10 +1,10 @@
 {
   "type": "wishing_fountain:wishing_fountain_recipe",
   "wish_type": "biome",
-  "target": "minecraft:savanna",
+  "target": "minecraft:desert",
   "ingredients": [
-    { "item": "minecraft:hay_block" },
-    { "item": "minecraft:leather" },
+    { "item": "minecraft:sand" },
+    { "item": "minecraft:dead_bush" },
     { "item": "minecraft:emerald" }
   ]
 }

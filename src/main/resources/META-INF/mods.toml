@@ -21,6 +21,13 @@ logoFile="goddess.png"
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT, or SERVER
     side="BOTH"
+# Butday's Blueprint integration — reading certain blueprints unlocks the Wishing Fountain
+[[dependencies.${mod_id}]]
+    modId="butdaysblueprint"
+    mandatory=false
+    versionRange="[1.0.0,)"
+    ordering="AFTER"
+    side="BOTH"
 # Here's another dependency
 [[dependencies.${mod_id}]]
     modId="minecraft"

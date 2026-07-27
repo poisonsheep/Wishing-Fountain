@@ -1,10 +1,10 @@
 {
   "type": "wishing_fountain:wishing_fountain_recipe",
   "wish_type": "biome",
-  "target": "minecraft:savanna",
+  "target": "minecraft:cherry_grove",
   "ingredients": [
-    { "item": "minecraft:hay_block" },
-    { "item": "minecraft:leather" },
+    { "item": "minecraft:honeycomb" },
+    { "item": "minecraft:feather" },
     { "item": "minecraft:emerald" }
   ]
 }

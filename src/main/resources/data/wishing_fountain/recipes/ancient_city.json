@@ -1,0 +1,10 @@
+{
+  "type": "wishing_fountain:wishing_fountain_recipe",
+  "wish_type": "structure",
+  "target": "minecraft:ancient_city",
+  "ingredients": [
+    { "item": "minecraft:diamond" },
+    { "item": "minecraft:paper" },
+    { "item": "minecraft:deepslate_bricks" }
+  ]
+}

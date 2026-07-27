@@ -1,0 +1,10 @@
+{
+  "type": "wishing_fountain:wishing_fountain_recipe",
+  "wish_type": "biome",
+  "target": "minecraft:snowy_plains",
+  "ingredients": [
+    { "item": "minecraft:snowball" },
+    { "item": "minecraft:spruce_sapling" },
+    { "item": "minecraft:white_wool" }
+  ]
+}

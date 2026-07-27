@@ -1,0 +1,10 @@
+{
+  "type": "wishing_fountain:wishing_fountain_recipe",
+  "wish_type": "biome",
+  "target": "minecraft:bamboo_jungle",
+  "ingredients": [
+    { "item": "minecraft:bamboo" },
+    { "item": "minecraft:jungle_sapling" },
+    { "item": "minecraft:slime_ball" }
+  ]
+}
